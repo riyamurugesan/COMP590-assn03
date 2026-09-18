@@ -48,11 +48,14 @@
             processInput();
 
             while (delta >= timestep){
+                stickFigure.previousAngle = stickFigure.angle;
                 update(timestep);
                 delta -= timestep;
             }
-            update(delta);
-            draw();
+
+            var interp = delta/timestep;
+
+            draw(interp);
             
             requestAnimationFrame(mainLoop);
         }
@@ -79,12 +82,13 @@
            }
         }
 
-        function draw(){
+        function draw(interp){
             context.clearRect(0,0, canvas.width, canvas.height);
             context.fillText("FPS: " + fps, 10, 10);
             framesThisSecond++;
+            var interpolatedAngle = stickFigure.previousAngle + (stickFigure.angle - stickFigure.previousAngle) * interp;
             context.save();
-            stickFigure.draw();
+            stickFigure.draw(interpolatedAngle);
             
             context.restore();
         }

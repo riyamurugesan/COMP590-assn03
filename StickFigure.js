@@ -5,6 +5,7 @@ function StickFigure(context){
     this.context = context;
     this.direction = 1; // 1 when going forward, 0 when going backwards
     this.angle = ((0 * Math.PI) / 180);
+    this.previousAngle = this.angle;
 
     StickFigure.prototype.drawTopOfSwing = function(){
         this.context.beginPath();
@@ -129,13 +130,13 @@ function StickFigure(context){
     //     this.context.stroke();
     // }
 
-    StickFigure.prototype.draw = function(){
+    StickFigure.prototype.draw = function(interpolatedAngle){
         this.context.save();
 
         this.drawTopOfSwing();
 
         this.context.translate(245,75);
-        this.context.rotate(this.angle);
+        this.context.rotate(interpolatedAngle);
         
         this.drawSwingLine();
         this.drawSwingSeat();
