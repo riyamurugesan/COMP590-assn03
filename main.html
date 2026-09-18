@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name = "viewport" content = "width=device-width">
+        <title>Stickman Swinging</title>
+    </head>
+    <body>
+        <canvas id="canvas" width = "500"
+                height = "500" style="border:1px solid #000;"></canvas>
+                
+    <script type="text/javascript" src="StickFigure.js"></script>
+
+    <script> "use strict"
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var stickFigure = new StickFigure(context);
+        var keysdown = {};
+        var speed = 1;
+        var fps = 0;
+        var framesThisSecond = 0;
+
+        setInterval(function() {fps = framesThisSecond; framesThisSecond = 0;}, 1000);
+
+        window.addEventListener("keydown", function (event) { //event listener for when user presses a key
+            if (event.defaultPrevented) {
+                return; 
+            }
+            keysdown[event.key] = true;
+            event.preventDefault();
+        }, true);
+
+
+        window.addEventListener("keyup", function (event) { //event listener for when user releases a key
+            if (event.defaultPrevented) {
+            return; 
+            }
+            keysdown[event.key] = false;
+            event.preventDefault();
+        }, true);
+
+        function mainLoop(){
+            processInput();
+            update();
+            draw();
+            
+            requestAnimationFrame(mainLoop);
+        }
+    
+        function processInput(){
+           if(keysdown.ArrowUp){
+            speed += 0.025;
+           }
+           if (keysdown.ArrowDown){
+            speed -= 0.025;
+           }
+        }
+
+        function draw(){
+            context.clearRect(0,0, canvas.width, canvas.height);
+            context.fillText("FPS: " + fps, 10, 10);
+            ++framesThisSecond;
+            context.save();
+            stickFigure.draw();
+            
+            context.restore();
+        }
+        
+        function update(){
+            if (speed > 0){
+                stickFigure.update(speed);
+            }
+        }
+        
+        mainLoop();
+        
+    </script>
+
+    </body>
+
+</html>
