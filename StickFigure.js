@@ -6,6 +6,8 @@ function StickFigure(context){
     this.direction = 1; // 1 when going forward, 0 when going backwards
     this.angle = ((0 * Math.PI) / 180);
     this.previousAngle = this.angle;
+    this.bigSmile = false;
+    this.frown = false;
 
     StickFigure.prototype.drawTopOfSwing = function(){
         this.context.beginPath();
@@ -59,7 +61,7 @@ function StickFigure(context){
         this.context.beginPath();
         this.context.arc(25, 110, 5, 0, 1 * Math.PI - 0.6);
         this.context.lineWidth = 2;
-        this.context.stroke();
+        this.context.stroke(); 
     }
 
     StickFigure.prototype.drawHead = function(){
@@ -123,12 +125,25 @@ function StickFigure(context){
         }
     }
 
-    // StickFigure.prototype.drawFrown = function(){
-    //     this.context.beginPath();
-    //     this.context.arc(27, 113, 5, 1.4 * Math.PI - 0.6, 2.2 * Math.PI - 0.6);
-    //     this.context.lineWidth = 2;
-    //     this.context.stroke();
-    // }
+    StickFigure.prototype.drawBigSmile = function(){
+        this.context.beginPath();
+        this.context.arc(28, 110, 7, 0, 1.2 * Math.PI - 0.6);
+        this.context.lineWidth = 2;
+        this.context.stroke();
+        
+        //closing off the mouth
+        this.context.beginPath();
+        this.context.moveTo(22, 110);
+        this.context.lineTo(36, 109);
+        this.context.stroke();
+    }
+
+    StickFigure.prototype.drawFrown = function(){
+        this.context.beginPath();
+        this.context.arc(27, 113, 5, 1.4 * Math.PI - 0.6, 2.2 * Math.PI - 0.6);
+        this.context.lineWidth = 2;
+        this.context.stroke();
+    }
 
     StickFigure.prototype.draw = function(interpolatedAngle){
         this.context.save();
@@ -142,7 +157,13 @@ function StickFigure(context){
         this.drawSwingSeat();
         this.drawArm();
         this.drawBody();
-        this.drawSmile();
+        if (this.bigSmile){
+            this.drawBigSmile();
+        } else if (this.frown){
+            this.drawFrown();
+        } else{
+            this.drawSmile();
+        }
         this.drawHead();
         this.drawLegs();
         this.drawEyes();
