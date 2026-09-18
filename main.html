@@ -8,7 +8,8 @@
     <body>
         <canvas id="canvas" width = "500"
                 height = "500" style="border:1px solid #000;"></canvas>
-                
+        <input type="range"  min="1" max="60" value="60" onchange="updateFrameRate(this.value)"/>
+        <span id="FrameRateLabel">60</span>
     <script type="text/javascript" src="StickFigure.js"></script>
 
     <script> "use strict"
@@ -17,35 +18,57 @@
         var stickFigure = new StickFigure(context);
         var keysdown = {};
         var speed = 1;
+        var delta = 0;
+
+        var maxFPS = 60; //max FPS allowed
+        function updateFrameRate(newFrameRate)
+        {
+            maxFPS = newFrameRate;
+            document.getElementById("FrameRateLabel").innerHTML=maxFPS;
+        }
+
         var fps = 0;
         var framesThisSecond = 0;
 
         setInterval(function() {fps = framesThisSecond; framesThisSecond = 0;}, 1000);
 
-        window.addEventListener("keydown", function (event) { //event listener for when user presses a key
-            if (event.defaultPrevented) {
-                return; 
+        var lastFrameTimeMS = 0;
+        var timestep = 1000/60;
+
+        function mainLoop(timestamp){
+
+            if (timestamp < lastFrameTimeMS + (1000/maxFPS)){
+                requestAnimationFrame(mainLoop);
+                return;
             }
+        
+            delta += timestamp - lastFrameTimeMS;
+            lastFrameTimeMS = timestamp;
+
+            processInput();
+
+            while (delta >= timestep){
+                update(timestep);
+                delta -= timestep;
+            }
+            update(delta);
+            draw();
+            
+            requestAnimationFrame(mainLoop);
+        }
+
+        window.addEventListener("keydown", function (event) { //event listener for when user presses a key
+            if (event.defaultPrevented) { return; }
             keysdown[event.key] = true;
             event.preventDefault();
         }, true);
 
 
         window.addEventListener("keyup", function (event) { //event listener for when user releases a key
-            if (event.defaultPrevented) {
-            return; 
-            }
+            if (event.defaultPrevented) { return; }
             keysdown[event.key] = false;
             event.preventDefault();
         }, true);
-
-        function mainLoop(){
-            processInput();
-            update();
-            draw();
-            
-            requestAnimationFrame(mainLoop);
-        }
     
         function processInput(){
            if(keysdown.ArrowUp){
@@ -59,20 +82,21 @@
         function draw(){
             context.clearRect(0,0, canvas.width, canvas.height);
             context.fillText("FPS: " + fps, 10, 10);
-            ++framesThisSecond;
+            framesThisSecond++;
             context.save();
             stickFigure.draw();
             
             context.restore();
         }
         
-        function update(){
+        function update(delta){
+            delta /= 15; //this number worked best to keep default speed the same as before.
             if (speed > 0){
-                stickFigure.update(speed);
+                stickFigure.update(speed * delta);
             }
         }
         
-        mainLoop();
+        requestAnimationFrame(mainLoop);
         
     </script>
 
